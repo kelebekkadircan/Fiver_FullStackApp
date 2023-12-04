@@ -1,122 +1,111 @@
-import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import "./Navbar.scss";
+import React, { useEffect, useState } from 'react'
+import './navbar.scss'
+import { Link, useLocation } from 'react-router-dom'
+import newRequest from '../../../utils/newRequest.js'
+import { useNavigate } from 'react-router-dom';
+// import { Link } from 'react-router-dom'
 
-function Navbar() {
-  const [active, setActive] = useState(false);
-  const [open, setOpen] = useState(false);
+const Navbar = () => {
 
-  const { pathname } = useLocation();
+    const [active, setActive] = useState(false)
+    const [open, setOpen] = useState(false)
 
-  const isActive = () => {
-    window.scrollY > 0 ? setActive(true) : setActive(false);
-  };
+    const { pathname } = useLocation()
+    // console.log(pathname);
+    const isActive = () => {
 
-  useEffect(() => {
-    window.addEventListener("scroll", isActive);
-    return () => {
-      window.removeEventListener("scroll", isActive);
-    };
-  }, []);
+        window.scrollY > 0 ? setActive(true) : setActive(false)
+    }
 
-  // const currentUser = null
 
-  const currentUser = {
-    id: 1,
-    username: "Anna",
-    isSeller: true,
-  };
 
-  return (
-    <div className={active || pathname !== "/" ? "navbar active" : "navbar"}>
-      <div className="container">
-        <div className="logo">
-          <Link className="link" to="/">
-            <span className="text">liverr</span>
-          </Link>
-          <span className="dot">.</span>
-        </div>
-        <div className="links">
-          <span>Liverr Business</span>
-          <span>Explore</span>
-          <span>English</span>
-          {!currentUser?.isSeller && <span>Become a Seller</span>}
-          {currentUser ? (
-            <div className="user" onClick={()=>setOpen(!open)}>
-              <img
-                src="https://images.pexels.com/photos/1115697/pexels-photo-1115697.jpeg?auto=compress&cs=tinysrgb&w=1600"
-                alt=""
-              />
-              <span>{currentUser?.username}</span>
-              {open && <div className="options">
-                {currentUser.isSeller && (
-                  <>
-                    <Link className="link" to="/mygigs">
-                      Gigs
-                    </Link>
-                    <Link className="link" to="/add">
-                      Add New Gig
-                    </Link>
-                  </>
-                )}
-                <Link className="link" to="/orders">
-                  Orders
-                </Link>
-                <Link className="link" to="/messages">
-                  Messages
-                </Link>
-                <Link className="link" to="/">
-                  Logout
-                </Link>
-              </div>}
-            </div>
-          ) : (
-            <>
-              <span>Sign in</span>
-              <Link className="link" to="/register">
-                <button>Join</button>
-              </Link>
-            </>
-          )}
-        </div>
-      </div>
-      {(active || pathname !== "/") && (
+    useEffect(() => {
+        window.addEventListener("scroll", isActive);
+
+        return () => {
+            window.removeEventListener('scroll', isActive)
+        }
+    }, [])
+
+    // const currentUser = {
+    //     id: 1,
+    //     username: "John Doe",
+    //     isSeller: true
+    // }
+    const navigate = useNavigate();
+
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+
+    const handleLogout = async () => {
+        try {
+            await newRequest.post("/auth/logout")
+            localStorage.setItem("currentUser", null);
+            navigate('/')
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    return (
         <>
-          <hr />
-          <div className="menu">
-            <Link className="link menuLink" to="/">
-              Graphics & Design
-            </Link>
-            <Link className="link menuLink" to="/">
-              Video & Animation
-            </Link>
-            <Link className="link menuLink" to="/">
-              Writing & Translation
-            </Link>
-            <Link className="link menuLink" to="/">
-              AI Services
-            </Link>
-            <Link className="link menuLink" to="/">
-              Digital Marketing
-            </Link>
-            <Link className="link menuLink" to="/">
-              Music & Audio
-            </Link>
-            <Link className="link menuLink" to="/">
-              Programming & Tech
-            </Link>
-            <Link className="link menuLink" to="/">
-              Business
-            </Link>
-            <Link className="link menuLink" to="/">
-              Lifestyle
-            </Link>
-          </div>
-          <hr />
+            <div className={active || pathname !== '/' ? "navbar active" : "navbar"}>
+                <div className="container">
+                    <div className="logo">
+                        <Link className='link' to='/'>
+                            <span className='text'>fiverr</span>
+                            <span className='dot'>.</span>
+
+                        </Link>
+                    </div>
+                    <div className="links">
+                        <span>Fiver Business</span>
+                        <span>Explore</span>
+                        <span>English</span>
+                        <span>Sign In</span>
+                        {currentUser?.isSeller && <span>Become a Seller</span>}
+                        {!currentUser && <button>Join</button>}
+                        {currentUser && (
+                            <div className='user' onClick={() => setOpen(!open)}>
+                                <img src={currentUser.img || "/img/noavatar.jpg"} alt="" />
+                                <span>{currentUser?.username} </span>
+                                {open && <div className='options'>
+                                    {
+                                        currentUser?.isSeller && (
+                                            <>
+                                                <Link className='link' to='/mygigs'>Gigs</Link>
+                                                <Link className='link' to='/add'>Add New Gigs</Link>
+                                            </>
+                                        )
+                                    }
+                                    <Link className='link' to='/orders'>Orders</Link>
+                                    <Link className='link' to='/messages'>Messages</Link>
+                                    <Link className='link' onClick={handleLogout} >Logout</Link>
+                                </div>}
+                            </div>
+                        )}
+                    </div>
+                </div>
+                {active || pathname !== '/' && (
+
+                    <>
+                        <hr />
+                        {/* BURAYA COPY PASTE AT */}
+                        <div className="menu">
+                            <span>Test1</span>
+                            <span>Test2</span>
+                            <span>Test3</span>
+                            <span>Test4</span>
+                            <span>Test5</span>
+                            <span>Test6</span>
+                        </div>
+                        <hr />
+                    </>
+                )
+                }
+            </div >
+
         </>
-      )}
-    </div>
-  );
+    )
 }
 
-export default Navbar;
+export default Navbar

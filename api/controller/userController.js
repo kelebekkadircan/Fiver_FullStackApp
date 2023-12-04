@@ -1,9 +1,27 @@
+import User from '../models/userModel.js';
+import jwt from 'jsonwebtoken';
+import { createError } from '../utils/createError.js';
 
 
 
+export const deleteUser = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id);
 
-export const deleteUser = (req, res) => {
-    res.send("the user has been delete")
+
+
+        if (req.userId !== user._id.toString()) {
+            return next(createError(403, "You can delete only your account"))
+
+        }
+        await User.findByIdAndDelete(req.params.id);
+        res.status(200).send("Deleted");
+
+
+
+    } catch (err) {
+        next(err)
+    }
 }
 
 
