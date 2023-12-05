@@ -45,6 +45,10 @@ const gigSchema = new Schema(
             type: String,
             required: true
         },
+        shortTitle: {
+            type: String,
+            required: true
+        },
         deliveryTime: {
             type: Number,
             required: true
