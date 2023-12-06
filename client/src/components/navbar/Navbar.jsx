@@ -61,9 +61,16 @@ const Navbar = () => {
                         <span>Fiver Business</span>
                         <span>Explore</span>
                         <span>English</span>
-                        <span>Sign In</span>
+                        {!currentUser && <Link className='link' to='/login'>
+
+                            <span>Sign In</span>
+                        </Link>}
                         {currentUser?.isSeller && <span>Become a Seller</span>}
-                        {!currentUser && <button>Join</button>}
+                        {!currentUser && <Link className='link' to='/register'>
+                            <button>
+                                Join
+                            </button>
+                        </Link>}
                         {currentUser && (
                             <div className='user' onClick={() => setOpen(!open)}>
                                 <img src={currentUser.img || "/img/noavatar.jpg"} alt="" />
