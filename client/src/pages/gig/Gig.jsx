@@ -27,7 +27,7 @@ const Gig = () => {
         queryKey: ["user"],
         queryFn: () =>
             newRequest.get(
-                `/users/${data.userId}`
+                `/users/${userId}`
             )
                 .then((res) => {
                     return res.data;

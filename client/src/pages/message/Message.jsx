@@ -1,19 +1,47 @@
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import './message.scss'
-
 import React from 'react'
+import { useQueryClient, useQuery, useMutation } from '@tanstack/react-query';
+import newRequest from '../../../utils/newRequest.js';
+
+
 
 const Message = () => {
 
-    const currentUser = {
-        id: 1,
-        username: "Anna",
-        isSeller: true,
+    const { id } = useParams();
+
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"))
+
+    const queryClient = useQueryClient();
+
+    const { isLoading, error, data } = useQuery({
+        queryKey: ["messages"],
+        queryFn: () =>
+            newRequest.get(`/messages/${id}`).then((res) => {
+                return res.data
+            })
+    })
+
+    const mutation = useMutation({
+        mutationFn: (message) => {
+            return newRequest.post(`/messages`, message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries(["messages"]);
+        },
+    });
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        mutation.mutate({
+            conversationId: id,
+            desc: e.target[0].value,
+        });
+        e.target[0].value = "";
     };
-    const message = `Lorem ipsum dolor sit amet consectetur adipisicing elit. Provident
-      maxime cum corporis esse aspernatur laborum dolorum? Animi
-      molestias aliquam, cum nesciunt, aut, ut quam vitae saepe repellat
-      nobis praesentium placeat.`;
+
+
+
     return (
         <>
             <div className='message'>
@@ -21,65 +49,34 @@ const Message = () => {
                     <span className="breadcrumbs">
                         <Link className='link' to='/messages' >MESSAGES </Link> / KADİRCAN DOE /
                     </span>
-                    <div className="messages">
-                        <div className="item">
-                            <img
-                                src="https://images.pexels.com/photos/270408/pexels-photo-270408.jpeg?auto=compress&cs=tinysrgb&w=1600"
-                                alt="" />
-                            <p>
-                                {message}
-                            </p>
+                    {isLoading ? "Loading..." : error ? "Something went Wrong"
+                        : <div className="messages">
+                            {data.map((message, i) => (
+
+                                <div className={message.userId === currentUser._id ? "owner item" : "item"} key={i}>
+                                    <img
+                                        src="https://images.pexels.com/photos/270408/pexels-photo-270408.jpeg?auto=compress&cs=tinysrgb&w=1600"
+                                        alt=""
+                                    />
+                                    <p>
+                                        {message.desc}
+                                    </p>
+                                </div>
+                            ))}
                         </div>
-                        <div className="item owner">
-                            <img
-                                src="https://images.pexels.com/photos/270408/pexels-photo-270408.jpeg?auto=compress&cs=tinysrgb&w=1600"
-                                alt="" />
-                            <p>
-                                {message}
-                            </p>
-                        </div>
-                        <div className="item">
-                            <img
-                                src="https://images.pexels.com/photos/270408/pexels-photo-270408.jpeg?auto=compress&cs=tinysrgb&w=1600"
-                                alt="" />
-                            <p>
-                                {message}
-                            </p>
-                        </div>
-                        <div className="item owner">
-                            <img
-                                src="https://images.pexels.com/photos/270408/pexels-photo-270408.jpeg?auto=compress&cs=tinysrgb&w=1600"
-                                alt="" />
-                            <p>
-                                {message}
-                            </p>
-                        </div>
-                        <div className="item">
-                            <img
-                                src="https://images.pexels.com/photos/270408/pexels-photo-270408.jpeg?auto=compress&cs=tinysrgb&w=1600"
-                                alt="" />
-                            <p>
-                                {message}
-                            </p>
-                        </div>
-                        <div className="item owner">
-                            <img
-                                src="https://images.pexels.com/photos/270408/pexels-photo-270408.jpeg?auto=compress&cs=tinysrgb&w=1600"
-                                alt="" />
-                            <p>
-                                {message}
-                            </p>
-                        </div>
-                    </div>
+                    }
                     <hr />
-                    <div className="write">
-                        <textarea name="" placeholder='write a message' id="" cols="30" rows="10">
+                    <form className="write" onSubmit={handleSubmit}>
+                        <textarea
+                            type='text' placeholder='write a message'
+                            id="" cols="30" rows="10"
+                        >
 
                         </textarea>
-                        <button>
+                        <button type='submit'>
                             Send
                         </button>
-                    </div>
+                    </form>
                 </div>
             </div>
 
